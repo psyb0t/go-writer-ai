@@ -2,6 +2,10 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.1.1, 2026-10-17
+
+- Documentation only. The README and `AGENTS.md` describe the daily regeneration workflow: what it checks, how it fixes failing checks, how it picks the next version and which paths a fix may not touch.
+
 ## v0.1.0, 2026-10-16
 
 - Added `writer`, a REST client generated with oapi-codegen from the OpenAPI document Writer publishes for its SDKs (Writer API, spec version 1.0, OpenAPI 3.0.3). It covers all 21 paths: chat, completions, models, files, Knowledge Graphs, no-code applications and their jobs, the PDF parser, web search and vision.

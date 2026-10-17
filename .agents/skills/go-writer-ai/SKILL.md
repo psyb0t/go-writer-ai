@@ -1,6 +1,7 @@
 ---
 name: go-writer-ai
 description: Unofficial Go client for the Writer (writer.com) API, generated from Writer's OpenAPI spec. `writer.NewClientWithResponses("https://api.writer.com", auth)` from `github.com/psyb0t/go-writer-ai` gives typed methods for chat (`ChatWithResponse`), text completions (`CompletionsWithResponse`), models (`ModelsWithResponse`), files (`GatewayGetFilesWithResponse`, `GatewayUploadFileWithBodyWithResponse`), Knowledge Graphs (`CreateGraphWithResponse`, `QuestionWithResponse`), no-code applications (`GenerateContentWithResponse`), the PDF parser, web search and vision, with responses decoded into `JSON200`. Auth is a Bearer API key set through a `RequestEditorFn`. Use when Go code needs to call the Writer API or already imports go-writer-ai.
+license: MIT
 homepage: https://github.com/psyb0t/go-writer-ai
 user-invocable: true
 metadata:
@@ -9,8 +10,6 @@ metadata:
     requires:
       bins:
         - go
-      env:
-        - WRITER_API_KEY
 permissions:
   filesystem: "Guides edits to the Go source of the current project. The library reads and writes no files; uploads send only the reader you pass."
   shell: "The Go toolchain (`go get`, `go build`, `go test`) to add and compile the dependency."
@@ -38,6 +37,20 @@ For install, the full operation list and streaming, see [references/setup.md](re
 
 - The code is not Go. Use Writer's official SDKs instead.
 - You need a parsed streaming client. The generated client returns the raw `*http.Response` for `stream: true`; it does not parse server-sent events.
+
+## Finding endpoints and types
+
+The examples below cover a few calls. Every operation in the spec has a generated method, and the spec's descriptions are on them as Go doc comments. Look names and fields up instead of guessing. After `go get github.com/psyb0t/go-writer-ai`, from inside your module:
+
+```bash
+go doc github.com/psyb0t/go-writer-ai ClientWithResponsesInterface  # every endpoint method
+go doc github.com/psyb0t/go-writer-ai ChatRequest                    # one method, params type or model
+go doc -all github.com/psyb0t/go-writer-ai                           # the whole package
+```
+
+The same documentation is at https://pkg.go.dev/github.com/psyb0t/go-writer-ai.
+
+Method names come from the spec's operation IDs. `<OperationId>WithResponse` takes the context, then the path parameters in order, then `*<OperationId>Params` when the operation has query or header parameters, then the request body when it has one. The `JSON200` field (or `JSON201` and so on, per declared status) holds the decoded body; it is nil for any other status. Operations without an operation ID are named from the HTTP method and path, such as `GetV1ApplicationsWithResponse`, and file upload has only the `GatewayUploadFileWithBodyWithResponse` and `GatewayUploadFileWithTextBodyWithResponse` variants.
 
 ## Usage
 

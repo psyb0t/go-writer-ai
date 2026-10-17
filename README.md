@@ -18,7 +18,7 @@ go get github.com/psyb0t/go-writer-ai
 
 ## Usage
 
-Every endpoint in the spec has a typed method on `ClientWithResponses`. Responses decode into `JSON200` and the other status fields.
+Every endpoint in the spec has a typed method on `ClientWithResponses`. Responses decode into `JSON200` and the other status fields. The full API, with the spec's descriptions as doc comments, is in the [Go reference](https://pkg.go.dev/github.com/psyb0t/go-writer-ai) and in `go doc github.com/psyb0t/go-writer-ai`.
 
 ```go
 package main

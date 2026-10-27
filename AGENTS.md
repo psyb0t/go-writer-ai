@@ -13,7 +13,7 @@ The spec needs no patch step. If a future spec breaks oapi-codegen, add a patch 
 
 ## Stack
 
-- Go 1.26.9, one package `writer` at the module root.
+- Go 1.26.10, one package `writer` at the module root.
 - oapi-codegen v2 and golangci-lint as `go tool` dependencies.
 - Runtime: `github.com/oapi-codegen/runtime`.
 

@@ -1,6 +1,6 @@
 {
   "name": "go-writer-ai",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Unofficial Go client for the Writer (writer.com) API: chat, completions, files, Knowledge Graphs, no-code applications and tools, generated from Writer's OpenAPI spec.",
   "author": { "name": "psyb0t", "url": "https://github.com/psyb0t" },
   "homepage": "https://github.com/psyb0t/go-writer-ai",

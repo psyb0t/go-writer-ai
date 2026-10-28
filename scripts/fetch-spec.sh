@@ -2,17 +2,15 @@
 # Downloads the Writer API OpenAPI spec into api/. The spec is not
 # committed; `go generate` fetches it as its first step.
 #
-# Writer's SDKs are built by Stainless, which hosts the spec under a URL that
-# carries a content hash and changes on every update. The SDK repo's .stats.yml
-# names the current URL, so read that first and then download the spec.
+# Writer publishes the gateway API spec behind its API reference at a fixed
+# URL, so the script downloads it directly.
 set -euo pipefail
 trap 'on_error "$?" "$LINENO"' ERR
 
 LOG_FILE="${LOG_FILE:-/tmp/$(basename "$0" .sh).log}"
 exec > >(tee -a "$LOG_FILE") 2>&1
 
-readonly STATS_URL="https://raw.githubusercontent.com/writer/writer-python/main/.stats.yml"
-readonly SPEC_URL_PREFIX="https://storage.googleapis.com/stainless-sdk-openapi-specs/"
+readonly SPEC_URL="https://dev.writer.com/api-reference/gateway-api-schema.yaml"
 readonly DOWNLOAD_TIMEOUT_SECONDS=60
 readonly SPEC_NAME="openapi.yaml"
 SPEC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/api"
@@ -40,21 +38,6 @@ log() {
 		'{time:$time,level:$level,file:$file,line:($line|tonumber),func:$func,msg:$msg}' >&2
 }
 
-spec_url() {
-	local stats
-	stats="$(wget -q -T "$DOWNLOAD_TIMEOUT_SECONDS" -O - "$STATS_URL")"
-
-	local url
-	url="$(printf '%s\n' "$stats" | sed -n 's/^openapi_spec_url:[[:space:]]*//p' | tr -d "\"'\r")"
-
-	if [[ "$url" != "${SPEC_URL_PREFIX}"* ]]; then
-		log ERROR "unexpected openapi_spec_url in .stats.yml url=${url}"
-		exit 1
-	fi
-
-	printf '%s\n' "$url"
-}
-
 main() {
 	mkdir -p "$SPEC_DIR"
 	local tmp
@@ -62,25 +45,24 @@ main() {
 	# shellcheck disable=SC2064 # expand tmp now, the local is gone when EXIT fires
 	trap "rm -f -- '${tmp}'" EXIT
 
-	local url
-	url="$(spec_url)"
-
-	log INFO "downloading spec=${SPEC_NAME} url=${url}"
+	log INFO "downloading spec=${SPEC_NAME} url=${SPEC_URL}"
 	wget -q \
 		-T "$DOWNLOAD_TIMEOUT_SECONDS" \
 		-O "$tmp" \
-		"$url"
+		"$SPEC_URL"
 
 	# The spec is YAML and the image has no YAML parser, so check for the
-	# top-level openapi key instead of parsing it.
-	if ! grep -qE '^openapi: ' "$tmp"; then
-		log ERROR "downloaded file is not an OpenAPI document spec=${SPEC_NAME}"
+	# openapi 3.x and paths keys instead of parsing it. The published document
+	# indents its top-level keys, so the patterns allow leading spaces.
+	if ! grep -qE '^[[:space:]]*openapi:[[:space:]]*[^0-9]?3\.' "$tmp" ||
+		! grep -qE '^[[:space:]]*paths:' "$tmp"; then
+		log ERROR "downloaded file is not an OpenAPI 3.x document spec=${SPEC_NAME}"
 		exit 1
 	fi
 
 	chmod 0644 "$tmp"
 	mv -- "$tmp" "${SPEC_DIR}/${SPEC_NAME}"
-	log INFO "saved spec=${SPEC_NAME} openapi=$(grep -m1 -E '^openapi: ' "${SPEC_DIR}/${SPEC_NAME}" | cut -d' ' -f2)"
+	log INFO "saved spec=${SPEC_NAME} openapi=$(grep -m1 -oE '^[[:space:]]*openapi:[[:space:]]*[^[:space:]]+' "${SPEC_DIR}/${SPEC_NAME}" | sed -E 's/.*openapi:[[:space:]]*//' | tr -d "\"'")"
 }
 
 main "$@"

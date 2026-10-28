@@ -81,7 +81,7 @@ make generate
 
 `gen.go` declares the steps, so `make generate` is just `go generate ./...`:
 
-- `scripts/fetch-spec.sh` reads `openapi_spec_url` from the `.stats.yml` of [writer/writer-python](https://github.com/writer/writer-python) and downloads that URL to `api/openapi.yaml`. The spec is hosted by Stainless under a URL that changes with every update, so the script looks it up each time.
+- `scripts/fetch-spec.sh` downloads the gateway API spec Writer publishes with its API reference, `https://dev.writer.com/api-reference/gateway-api-schema.yaml`, to `api/openapi.yaml`.
 - oapi-codegen runs with `config.yaml`. The config maps `number` to `float64`, because the spec gives temperatures and scores no format and oapi-codegen would otherwise use `float32`.
 
 `.github/workflows/regen.yml` does the same every day in CI. When the new spec changes the client, it runs `make lint`, `make test` and `make sec`. If a check fails, Claude edits the code and the checks run again, up to three times, and a review step reads the result. A passing change is committed with a CHANGELOG entry and tagged as the next release: a patch version for fixes and additions, a minor version for breaking changes.

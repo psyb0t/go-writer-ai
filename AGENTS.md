@@ -6,7 +6,7 @@ Unofficial Go client for the Writer (writer.com) API, generated with oapi-codege
 
 `make generate` runs `go generate ./...`, which runs the steps in `gen.go`:
 
-1. `scripts/fetch-spec.sh` reads `openapi_spec_url` from the `.stats.yml` of writer/writer-python and downloads that spec to `api/openapi.yaml`.
+1. `scripts/fetch-spec.sh` downloads the gateway API spec Writer publishes at `https://dev.writer.com/api-reference/gateway-api-schema.yaml` (OpenAPI 3.0.3, YAML) to `api/openapi.yaml`.
 2. oapi-codegen (`go tool oapi-codegen`) reads `config.yaml` and writes `client.gen.go`.
 
 The spec needs no patch step. If a future spec breaks oapi-codegen, add a patch step to `gen.go` that writes a fixed copy under `api/`.
@@ -41,7 +41,7 @@ make sec       # gitleaks, govulncheck, semgrep
 
 ## Project-specific landmines
 
-- The Stainless spec URL carries a content hash and changes on every upstream update. Never hardcode it; `fetch-spec.sh` looks it up each run.
+- The published YAML indents its top-level keys. The dev image has no YAML parser, so `fetch-spec.sh` checks the `openapi` and `paths` keys with grep patterns that allow leading spaces.
 - Several operations have no `operationId`, so their methods are named from the method and path (`GetV1Applications`, `PostV1ToolsWebSearch`). Upstream adding an ID renames the method.
 - The spec types some IDs as UUIDs and others as plain strings, so `graphId` and `applicationId` parameters differ in Go type between methods.
 - Regenerating can rename types when upstream schemas change (the `...Response2` names come from collision resolution). Check the tests and the skill after every `make generate`.

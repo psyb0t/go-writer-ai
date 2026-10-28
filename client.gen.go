@@ -1368,7 +1368,7 @@ type ChatCompletionChoice struct {
 	Message ChatCompletionResponseMessage `json:"message"`
 }
 
-// ChatCompletionChunk defines model for chat_completion_chunk.
+// ChatCompletionChunk Example: {"choices":[{"finish_reason":"stop","message":{"content":"Hello! How can I assist you today?","role":"user"}}],"created":1678587532773,"id":"3c90c3cc-0d44-4b50-8888-8dd25736052a","model":"palmyra-x5"}
 type ChatCompletionChunk struct {
 	// Choices An array of objects representing the different outcomes or results produced by the model based on the input provided.
 	Choices []ChatCompletionStreamingChoice `json:"choices"`
@@ -1483,7 +1483,7 @@ type ChatMessageRequestRole string
 // ChatMessageRole defines model for chat_message_role.
 type ChatMessageRole string
 
-// ChatRequest defines model for chat_request.
+// ChatRequest Example: {"messages":[{"content":"Write a memo summarizing this earnings report.","role":"user"}],"model":"palmyra-x5"}
 type ChatRequest struct {
 	// Logprobs Specifies whether to return log probabilities of the output tokens.
 	Logprobs *bool `json:"logprobs,omitempty"`
@@ -1543,7 +1543,7 @@ type ChatRequest_Stop struct {
 	union json.RawMessage
 }
 
-// ChatResponse defines model for chat_response.
+// ChatResponse Example: {"choices":[{"finish_reason":"stop","message":{"content":"Hello! How can I assist you today?","role":"user"}}],"created":1678587532773,"id":"3c90c3cc-0d44-4b50-8888-8dd25736052a","model":"palmyra-x5"}
 type ChatResponse struct {
 	// Choices An array of objects representing the different outcomes or results produced by the model based on the input provided.
 	Choices []ChatCompletionChoice `json:"choices"`
@@ -1716,8 +1716,8 @@ type FilesResponse struct {
 
 // Function defines model for function.
 type Function struct {
-	Arguments string  `json:"arguments"`
-	Name      *string `json:"name,omitempty"`
+	Arguments string `json:"arguments"`
+	Name      string `json:"name"`
 }
 
 // FunctionTool defines model for function_tool.

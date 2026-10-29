@@ -2,6 +2,15 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.3.0, 2026-10-29
+
+- Breaking: removed the vision endpoint. `Client.PostV1Vision`, `Client.PostV1VisionWithBody`, the matching `ClientWithResponses` methods, `NewPostV1VisionRequest`, `ParsePostV1VisionResponse`, `PostV1VisionJSONRequestBody`, `PostV1VisionResponse`, `VisionRequest` and `VisionResponse` are gone.
+- Breaking: removed the web search endpoint. `Client.PostV1ToolsWebSearch`, `Client.PostV1ToolsWebSearchWithBody`, the matching `ClientWithResponses` methods, `NewPostV1ToolsWebSearchRequest`, `ParsePostV1ToolsWebSearchResponse`, `PostV1ToolsWebSearchJSONRequestBody`, `PostV1ToolsWebSearchResponse`, `WebSearchRequest` and `WebSearchResponse` are gone, along with the `WebSearchRequest*` enum constants such as `WebSearchRequestCountry` and `WebSearchRequestTopic`.
+- Breaking: removed the translation and vision tool types. `TranslationTool`, `TranslationFunction`, `TranslationData`, `VisionTool`, `VisionFunction` and their enum constants are gone, as are `Tool.AsTranslationTool`, `Tool.FromTranslationTool`, `Tool.MergeTranslationTool`, `Tool.AsVisionTool`, `Tool.FromVisionTool` and `Tool.MergeVisionTool`.
+- Breaking: removed the `TranslationData` field from `ChatCompletionResponseMessage` and `ChatCompletionStreamingDelta`.
+- The `ClientInterface` and `ClientWithResponsesInterface` interfaces lose the vision and web search methods, so custom implementations and mocks must drop them.
+- Updated the `Tools` field documentation: the built-in tools are `graph`, `llm` and `web_search`.
+
 ## v0.2.0, 2026-10-28
 
 - The client is generated from the spec Writer publishes at `https://dev.writer.com/api-reference/gateway-api-schema.yaml`. The Stainless-hosted copy of the spec it used before is no longer publicly readable, so scheduled regeneration had stopped.

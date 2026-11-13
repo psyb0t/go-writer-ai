@@ -496,21 +496,6 @@ func (e WebConnectorUrlType) Valid() bool {
 	}
 }
 
-// Defines values for WebSearchToolType.
-const (
-	WebSearchToolTypeWebSearch WebSearchToolType = "web_search"
-)
-
-// Valid indicates whether the value is a known member of the WebSearchToolType enum.
-func (e WebSearchToolType) Valid() bool {
-	switch e {
-	case WebSearchToolTypeWebSearch:
-		return true
-	default:
-		return false
-	}
-}
-
 // Defines values for GetV1ApplicationsParamsOrder.
 const (
 	GetV1ApplicationsParamsOrderAsc  GetV1ApplicationsParamsOrder = "asc"
@@ -731,9 +716,8 @@ type ChatCompletionResponseMessage struct {
 	Refusal   *string    `json:"refusal"`
 
 	// Role Specifies the role associated with the content.
-	Role          ChatCompletionResponseMessageRole `json:"role"`
-	ToolCalls     *[]ToolCall                       `json:"tool_calls,omitempty"`
-	WebSearchData *WebSearchData                    `json:"web_search_data,omitempty"`
+	Role      ChatCompletionResponseMessageRole `json:"role"`
+	ToolCalls *[]ToolCall                       `json:"tool_calls,omitempty"`
 }
 
 // ChatCompletionResponseMessageRole Specifies the role associated with the content.
@@ -848,7 +832,7 @@ type ChatRequest struct {
 	// You can also use a JSON object to force the model to call a specific tool. For example, `{"type": "function", "function": {"name": "get_current_weather"}}` requires the model to call the `get_current_weather` function, regardless of the prompt.
 	ToolChoice *ToolChoice `json:"tool_choice,omitempty"`
 
-	// Tools An array containing tool definitions for tools that the model can use to generate responses. The tool definitions use JSON schema. You can define your own functions or use one of the built-in `graph`, `llm`, or `web_search` tools. Note that you can only use one built-in tool type in the array (only one of `graph`, `llm`, or `web_search`). You can pass multiple [custom tools](https://dev.writer.com/home/tool-calling) of type `function` in the same request.
+	// Tools An array containing tool definitions for tools that the model can use to generate responses. The tool definitions use JSON schema. You can define your own functions or use one of the built-in `graph` or `llm` tools. Note that you can only use one built-in tool type in the array (only one of `graph` or `llm`). You can pass multiple [custom tools](https://dev.writer.com/home/tool-calling) of type `function` in the same request.
 	Tools *[]Tool `json:"tools,omitempty"`
 
 	// TopP Sets the threshold for "nucleus sampling," a technique to focus the model's token generation on the most likely subset of tokens. Only tokens with cumulative probability above this threshold are considered, controlling the trade-off between creativity and coherence.
@@ -1710,35 +1694,6 @@ type WebConnectorUrlStatus string
 // WebConnectorUrlType The type of web connector processing for a URL.
 type WebConnectorUrlType string
 
-// WebSearchData defines model for web_search_data.
-type WebSearchData struct {
-	Sources []struct {
-		RawContent *string `json:"raw_content,omitempty"`
-		Url        *string `json:"url,omitempty"`
-	} `json:"sources"`
-}
-
-// WebSearchFunction A tool that uses web search to find information.
-type WebSearchFunction struct {
-	// ExcludeDomains An array of domains to exclude from the search results.
-	ExcludeDomains []string `json:"exclude_domains"`
-
-	// IncludeDomains An array of domains to include in the search results.
-	IncludeDomains []string `json:"include_domains"`
-}
-
-// WebSearchTool defines model for web_search_tool.
-type WebSearchTool struct {
-	// Function A tool that uses web search to find information.
-	Function WebSearchFunction `json:"function"`
-
-	// Type The type of tool.
-	Type WebSearchToolType `json:"type"`
-}
-
-// WebSearchToolType The type of tool.
-type WebSearchToolType string
-
 // GetV1ApplicationsParams defines parameters for GetV1Applications.
 type GetV1ApplicationsParams struct {
 	// Order Sort order for the results based on creation time.
@@ -2339,40 +2294,6 @@ func (t *Tool) MergeLlmTool(v LlmTool) error {
 	return err
 }
 
-// AsWebSearchTool returns the union data inside the Tool as a WebSearchTool
-func (t Tool) AsWebSearchTool() (WebSearchTool, error) {
-	var body WebSearchTool
-	err := json.Unmarshal(t.union, &body)
-	return body, err
-}
-
-// FromWebSearchTool overwrites any union data inside the Tool as the provided WebSearchTool
-func (t *Tool) FromWebSearchTool(v WebSearchTool) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-	b, err = runtime.JSONMerge(b, []byte(`{"type":"web_search"}`))
-	t.union = b
-	return err
-}
-
-// MergeWebSearchTool performs a merge with any union data inside the Tool, using the provided WebSearchTool
-func (t *Tool) MergeWebSearchTool(v WebSearchTool) error {
-	b, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
-	b, err = runtime.JSONMerge(b, []byte(`{"type":"web_search"}`))
-	if err != nil {
-		return err
-	}
-
-	merged, err := runtime.JSONMerge(t.union, b)
-	t.union = merged
-	return err
-}
-
 func (t Tool) Discriminator() (string, error) {
 	var discriminator struct {
 		Discriminator string `json:"type"`
@@ -2393,8 +2314,6 @@ func (t Tool) ValueByDiscriminator() (interface{}, error) {
 		return t.AsGraphTool()
 	case "llm":
 		return t.AsLlmTool()
-	case "web_search":
-		return t.AsWebSearchTool()
 	default:
 		return nil, errors.New("unknown discriminator value: " + discriminator)
 	}

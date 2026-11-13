@@ -2,6 +2,13 @@
 
 All notable changes per release. Versions follow [semver](https://semver.org).
 
+## v0.4.0, 2026-11-13
+
+- Breaking: removed the web search tool type. `WebSearchTool`, `WebSearchFunction`, `WebSearchToolType`, `WebSearchToolTypeWebSearch`, `Tool.AsWebSearchTool`, `Tool.FromWebSearchTool` and `Tool.MergeWebSearchTool` are gone.
+- Breaking: removed `WebSearchData` and the `WebSearchData` field of `ChatCompletionResponseMessage`.
+- Updated the `Tools` field documentation of `ChatRequest`: the built-in tools are `graph` and `llm`.
+- Raised the minimum Go version in `go.mod` from 1.26.10 to 1.26.11, which fixes the `net/http` vulnerability GO-2026-6859 found by govulncheck. The development image uses `golang:1.26.11-trixie`.
+
 ## v0.3.0, 2026-10-29
 
 - Breaking: removed the vision endpoint. `Client.PostV1Vision`, `Client.PostV1VisionWithBody`, the matching `ClientWithResponses` methods, `NewPostV1VisionRequest`, `ParsePostV1VisionResponse`, `PostV1VisionJSONRequestBody`, `PostV1VisionResponse`, `VisionRequest` and `VisionResponse` are gone.
